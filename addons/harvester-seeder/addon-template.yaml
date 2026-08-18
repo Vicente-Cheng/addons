@@ -1,0 +1,20 @@
+apiVersion: harvesterhci.io/v1beta1
+kind: Addon
+metadata:
+  name: harvester-seeder
+  namespace: harvester-system
+  labels:
+    addon.harvesterhci.io/experimental: "true"
+spec:
+  repo: http://harvester-cluster-repo.cattle-system.svc/charts
+  version: << .HARVESTER_SEEDER_CHART_VERSION >>
+  chart: harvester-seeder
+  {{- if and .Addons .Addons.harvester_seeder}}
+  enabled: {{ .Addons.harvester_seeder.Enabled }}
+  {{- else }}
+  enabled: false
+  {{- end }}
+  valuesContent: |
+    image:
+      tag: << .HARVESTER_SEEDER_IMAGE >>
+    fullnameOverride: harvester-seeder

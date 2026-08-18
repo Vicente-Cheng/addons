@@ -1,0 +1,5 @@
+name: harvester-seeder
+namespace: harvester-system
+stage: experimental
+builtIn: true
+deprecated: false

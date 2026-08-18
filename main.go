@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	templateSource = "./pkg/templates"
+	templateSource = "./addons"
 )
 
 func main() {
-	var generateAddons, generateTemplates bool
+	var generateAddons, generateTemplates, validate bool
 	var path string
 	app := &cli.App{
 		Flags: []cli.Flag{
@@ -30,6 +30,12 @@ func main() {
 				Usage:       "generate template manifests",
 				Destination: &generateTemplates,
 			},
+			&cli.BoolFlag{
+				Name:        "validate",
+				Value:       false,
+				Usage:       "validate the addon directory layout and metadata",
+				Destination: &validate,
+			},
 			&cli.StringFlag{
 				Name:        "path",
 				Value:       ".",
@@ -39,8 +45,14 @@ func main() {
 		},
 
 		Action: func(ctx *cli.Context) error {
-			if !generateAddons && !generateTemplates {
-				return fmt.Errorf("generateAddons or generateTemplates need to be specified")
+			if !generateAddons && !generateTemplates && !validate {
+				return fmt.Errorf("generateAddons, generateTemplates or validate need to be specified")
+			}
+
+			// generation always validates the layout first, so invalid
+			// metadata can never produce ISO or upgrade artifacts
+			if err := render.Validate(templateSource, "version_info"); err != nil {
+				return fmt.Errorf("error validating addons: %v", err)
 			}
 
 			if generateAddons {

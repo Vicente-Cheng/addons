@@ -1,0 +1,5 @@
+name: nvidia-driver-toolkit
+namespace: harvester-system
+stage: ga
+builtIn: true
+deprecated: false

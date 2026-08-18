@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	relativeTemplatePath    = "../templates"
+	relativeAddonsPath      = "../../addons"
 	defaultFileName         = "rancherd-22-addons.yaml"
 	relativeVersionFilePath = "../../"
 	defaultVersionFile      = "version_info"
@@ -25,41 +25,51 @@ type AddonResources struct {
 	Resources []map[string]interface{} `json:"resources,omitempty"`
 }
 
-func Addon(templateSource, destPath, versionFilePath string) error {
-
+// renderResources fully renders the assembled template (both the `<< >>`
+// version variables and the `{{ }}` rancherd runtime directives) and returns
+// the resulting Addon resources.
+func renderResources(templateSource, versionFilePath string) (*AddonResources, error) {
 	tmpDir := os.TempDir()
 	tmpPath, err := os.MkdirTemp(tmpDir, "rendered")
 	if err != nil {
-		return fmt.Errorf("error creating temp addon-template file: %v", err)
+		return nil, fmt.Errorf("error creating temp addon-template file: %v", err)
 	}
 	defer os.RemoveAll(tmpPath)
 
 	err = Template(templateSource, tmpPath, versionFilePath)
 	if err != nil {
-		return fmt.Errorf("error generating temp file: %v", err)
+		return nil, fmt.Errorf("error generating temp file: %v", err)
 	}
 
 	// read temporary template file to generate rendered addons
 	contents, err := os.ReadFile(filepath.Join(tmpPath, defaultFileName))
 	if err != nil {
-		return fmt.Errorf("error reading template file %s: %v", defaultFileName, err)
+		return nil, fmt.Errorf("error reading template file %s: %v", defaultFileName, err)
 	}
 
 	tmpl, err := template.New("").Parse(string(contents))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	renderedContent, err := renderTemplate(tmpl, versionFilePath)
 	if err != nil {
-		return fmt.Errorf("error rendering template: %v", err)
+		return nil, fmt.Errorf("error rendering template: %v", err)
 	}
 
 	//split rendered template into individual files
 	resources := &AddonResources{}
 	err = yaml.Unmarshal(renderedContent, resources)
 	if err != nil {
-		return fmt.Errorf("error unmarshalling resources: %v", err)
+		return nil, fmt.Errorf("error unmarshalling resources: %v", err)
+	}
+	return resources, nil
+}
+
+func Addon(templateSource, destPath, versionFilePath string) error {
+	resources, err := renderResources(templateSource, versionFilePath)
+	if err != nil {
+		return err
 	}
 
 	for _, v := range resources.Resources {
@@ -140,10 +150,13 @@ func generate_version_info_map(versionFilePath string) (map[string]string, error
 	return result, nil
 }
 
+// Template assembles the builtIn addon fragments under templateSource (the
+// addons root directory) and renders the `<< >>` version variables from the
+// version_info file; the `{{ }}` rancherd runtime directives are left intact.
 func Template(templateSource, destPath, versionFilePath string) error {
-	contents, err := os.ReadFile(filepath.Join(templateSource, defaultFileName))
+	contents, err := AssembleTemplate(templateSource)
 	if err != nil {
-		return fmt.Errorf("error reading template file %s: %v", defaultFileName, err)
+		return err
 	}
 
 	tmpl, err := template.New("").Delims("<<", ">>").Parse(string(contents))
