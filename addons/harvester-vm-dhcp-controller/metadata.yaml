@@ -1,0 +1,5 @@
+name: harvester-vm-dhcp-controller
+namespace: harvester-system
+stage: experimental
+builtIn: false
+deprecated: false

@@ -1,0 +1,5 @@
+name: harvester-csi-driver-lvm
+namespace: harvester-system
+stage: experimental
+builtIn: false
+deprecated: false
