@@ -165,6 +165,7 @@ func matchResource(m Metadata, resource map[string]interface{}, source string) e
 	expected := map[string]bool{
 		labelExperimental: m.Stage == StageExperimental,
 		labelPreview:      m.Stage == StagePreview,
+		labelGA:           m.Stage == StageGA,
 		labelDeprecated:   m.Deprecated,
 	}
 	for label, want := range expected {

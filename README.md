@@ -17,7 +17,8 @@ addons/<name>/
   complete, insufficient test coverage), `preview` (partial detail features and
   partial test coverage) or `ga` (feature complete with sufficient automated
   coverage). The stage determines the `addon.harvesterhci.io/experimental` /
-  `addon.harvesterhci.io/preview` labels on the Addon resource.
+  `addon.harvesterhci.io/preview` / `addon.harvesterhci.io/ga` label on the
+  Addon resource.
 - `builtIn`: whether the addon is packaged into the Harvester ISO and managed
   by upgrades. This is a usage-driven packaging decision, independent of stage.
 

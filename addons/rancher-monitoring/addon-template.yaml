@@ -3,6 +3,8 @@ kind: Addon
 metadata:
   name: rancher-monitoring
   namespace: cattle-monitoring-system
+  labels:
+    addon.harvesterhci.io/ga: "true"
 spec:
   repo: http://harvester-cluster-repo.cattle-system.svc/charts
   version: << .RANCHER_MONITORING_CHART_VERSION >>

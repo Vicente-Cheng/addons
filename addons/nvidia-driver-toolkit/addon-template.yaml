@@ -3,6 +3,8 @@ kind: Addon
 metadata:
   name: nvidia-driver-toolkit
   namespace: harvester-system
+  labels:
+    addon.harvesterhci.io/ga: "true"
 spec:
   repo: http://harvester-cluster-repo.cattle-system.svc/charts
   version: << .NVIDIA_DRIVER_RUNTIME_CHART_VERSION >>

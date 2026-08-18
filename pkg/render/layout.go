@@ -22,6 +22,7 @@ const (
 
 	labelExperimental = "addon.harvesterhci.io/experimental"
 	labelPreview      = "addon.harvesterhci.io/preview"
+	labelGA           = "addon.harvesterhci.io/ga"
 	labelDeprecated   = "addon.harvesterhci.io/deprecated"
 )
 
